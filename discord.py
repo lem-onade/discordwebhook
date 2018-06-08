@@ -14,16 +14,16 @@ import json
 
 #Webhook URL
 #-- best afblijven (tenzij ge dit gebruikt voor een andere server)
-url = "https://discordapp.com/api/webhooks/454652577251065866/jMGBA1bDAeN0bzhFSqidyCQRlFithWYjfayWyAhCodeG0PHORSpVdL2go9p6lSDfA5Ad"
+url = ""
 
 #PARAMS
 #USERNAME
 #-- default hostname
-username = "PaTee's Woke Woker"
+username = ""
 
 #MESSAGE CONTENT
 #-- default filler
-content = "<@!326444539537522688>"
+content = "<"
 
 #SET AVATAR URL
 #-- default swennen met koffie
@@ -59,7 +59,10 @@ if len(params[2]) == 0 or not re.match(httpr, avatar_url):
     query[paramnames[2]] = "https://showme1-9071.kxcdn.com/pics/profile/avatar/fbavatar_53b75406810298d982889daa383874cf.jpg"
 if len(params[3]) == 0 or (params[3] != "true" or params[3] != "false"):
     query[paramnames[3]] = "false"
-#avatar_url check
+#url check
+if len(url) == 0:
+    print("please provide webhook url")
+    quit()
 pattern = r"jpg$|png$"
 if re.match(pattern, query[paramnames[2]]) and query[paramnames[2]] != "https://showme1-9071.kxcdn.com/pics/profile/avatar/fbavatar_53b75406810298d982889daa383874cf.jpg":
     print("Avatar URL OK")
