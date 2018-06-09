@@ -14,15 +14,15 @@ username = ""
 
 #MESSAGE CONTENT
 #-- default filler
-content = "<"
+content = ""
 
 #SET AVATAR URL
 #-- default swennen met koffie
-avatar_url = "https://newgateclocks.com/media/catalog/product/cache/10/image/9df78eab33525d08d6e5fb8d27136e95/n/u/numone149fer_-_number_one_echo_-_fire_engine_red_1.png"
+avatar_url = ""
 
 #TTS = Text To Speech
 #-- default false
-tts="true"
+tts=""
 
 #FILE TO OPEN (ENTER PATH)
 #-- optional default empty (TODO -- doesn't work)
