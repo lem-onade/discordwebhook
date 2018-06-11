@@ -1,37 +1,30 @@
+#!/usr/bin/env python3
+from optparse import OptionParser
 import requests
 import socket
-import re
 import json
+import time
+import sys
+import re
+import os
 
-#Webhook URL
-#-- required
-url = ""
-
-#PARAMS
-#USERNAME
-#-- default hostname
-username = ""
-
-#MESSAGE CONTENT
-#-- default filler
-content = "<"
-
-#SET AVATAR URL
-#-- default swennen met koffie
-avatar_url = "https://newgateclocks.com/media/catalog/product/cache/10/image/9df78eab33525d08d6e5fb8d27136e95/n/u/numone149fer_-_number_one_echo_-_fire_engine_red_1.png"
-
-#TTS = Text To Speech
-#-- default false
-tts="true"
-
-#FILE TO OPEN (ENTER PATH)
-#-- optional default empty (TODO -- doesn't work)
-filepath=""
-    
-#EMBED LINKS
-#-- optional default empty
-embeds=""
-
+#parse options
+parser = OptionParser()
+parser.add_option("-w", "--webhook_url", dest="webhook_url", default="", help="sets webhook url")
+parser.add_option("-u", "--user", dest="username", default=socket.gethostname(), help="sets username")
+parser.add_option("-m", "--message", dest="content", default="default message", help="sets content of message")
+parser.add_option("-a", "--avatar_url", dest="avatar_url", default="https://showme1-9071.kxcdn.com/pics/profile/avatar/fbavatar_53b75406810298d982889daa383874cf.jpg", help="sets avatar image to image on avatar_url")
+parser.add_option("-t", "--tts", dest="tts", default="False", help="sets tts value (True/False)")
+parser.add_option("-i", "--infile", dest="file", default="", help="sets file to attach") #not implemented
+parser.add_option("-e", "--embed", dest="embeds", default="", help="sets page to embed") #not implemented
+(options, args) = parser.parse_args()
+url=options.webhook_url.strip()
+username=options.username
+content=options.content
+avatar_url=options.avatar_url
+tts=options.tts
+filepath=options.file
+embeds=options.embeds
 
 #parsing etc
 query = {}
@@ -40,25 +33,18 @@ params = [username, content, avatar_url, tts, filepath, embeds]
 for i in range(0,len(params)):
     if len(params[i]) > 0:
         query[paramnames[i]] = params[i]
-#defaults
-httpr = r"^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$"
-if len(params[0]) == 0:
-    query[paramnames[0]] = socket.gethostname()
-if len(params[1]) == 0:
-    query[paramnames[1]] = socket.gethostname()+" is vergeten content in te vullen, haha"
-if len(params[2]) == 0 or not re.match(httpr, avatar_url):
-    query[paramnames[2]] = "https://showme1-9071.kxcdn.com/pics/profile/avatar/fbavatar_53b75406810298d982889daa383874cf.jpg"
-if len(params[3]) == 0 or (params[3] != "true" or params[3] != "false"):
-    query[paramnames[3]] = "false"
+
 #url checks
+httpr = r"^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$"
 if len(url) == 0:
-    print("please provide webhook url")
+    print("Please provide webhook url with \"-w [url]\"")
     quit()
 pattern = r"jpg$|png$"
 if re.match(pattern, query[paramnames[2]]) and query[paramnames[2]] != "https://showme1-9071.kxcdn.com/pics/profile/avatar/fbavatar_53b75406810298d982889daa383874cf.jpg":
     print("Avatar URL OK")
 if re.match(httpr, url):
     print("Webhook URL OK")
+
 #posting
 try:
     r = requests.get(url)
@@ -66,10 +52,18 @@ try:
     name = data["name"]
     channel_id = data["channel_id"]
     print("Sending to hook: "+name+" (Channel ID: "+channel_id+")")
-except ConnectionError:
+except:
     print('Failed to open url.')
+    if data["code"] is not None:
+        print(data["code"])
 if requests.post(url, data=query):
-    print("Message sent")
+    print("Message sent (\""+content+"\")")
 else:
-    print("Message failed to send. "+json.loads(requests.post(url, data=query).text)["message"])
+    error = json.loads(requests.post(url, data=query).text)
+    print("Message not sent. "+ error["message"])
+    if error["message"] == 'You are being rate limited.':
+        times = int(error["retry_after"] / 1000)
+        for i in range(times, 0, -1):
+            print(("Waiting %i seconds before retrying" % i), end='\r', file=sys.stdout, flush=True)
+            time.sleep(1)
 #TODO: modules/options & files
