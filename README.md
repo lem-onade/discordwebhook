@@ -1,6 +1,11 @@
 # discordwebhook
 Webhook Bot Messages (Python 3.6)
 
-To run: python3 discord.py
+To run: "python3 discord.py [OPTIONS]" or "./discord.py [OPTIONS]" (requires exec permissions eg. chmod 777)
 
-NOTE: requires module "requests": will install automatically if not installed, sry
+Requires option "-w" to be filled in with webhook URL
+
+See "./discord -h" for help
+
+//TODO files & embed
+
