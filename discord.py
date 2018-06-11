@@ -54,8 +54,6 @@ try:
     print("Sending to hook: "+name+" (Channel ID: "+channel_id+")")
 except:
     print('Failed to open url.')
-    if data["code"] is not None:
-        print(data["code"])
 if requests.post(url, data=query):
     print("Message sent (\""+content+"\")")
 else:
